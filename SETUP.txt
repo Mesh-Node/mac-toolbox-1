@@ -1,0 +1,59 @@
+# Harness setup
+
+Read this before the vault. The checks below finish the login. The hop hook comes after those checks.
+
+## Chat default
+
+Hermes chat stays on Grok. The person at that Mac logs in. A key stays on that Mac, outside this folder and outside chat.
+
+Settings:
+
+- model.default: grok-4.7
+- model.provider: xai-oauth
+- model.base_url: https://api.x.ai/v1
+
+The default stays on that Grok login.
+
+## Models
+
+Two slots. Each slot keeps its own model.
+
+- Chat, and every Honcho language slot (deriver, summary, dream, dialectic): Grok, through the login above. grok-4.7 is the Hermes default.
+- Embeddings, for search that matches the mesh: nomic-embed-text-v1.5, F16, 768 dimensions. Same Hugging Face snapshot the mesh serves. This slot is the F16 file, served by llama-server.
+
+The embedder listens on 127.0.0.1:11435. Honcho's API listens on 127.0.0.1:8000. Each port keeps its own process.
+
+## Honcho
+
+Local server. honcho.json stays on the Mac that ran setup.
+
+- Self-host: https://honcho.dev/docs/v3/contributing/self-hosting
+- Hermes wire: https://docs.honcho.dev/v3/guides/integrations/hermes
+- On a fresh install: `hermes memory setup honcho`
+- Point it at http://127.0.0.1:8000. The person at that Mac finishes any login. A key stays on that Mac.
+
+Embedding settings live in that server's env:
+
+- EMBEDDING_MODEL_CONFIG__MODEL=nomic-embed-text-v1.5
+- EMBEDDING_VECTOR_DIMENSIONS=768
+- EMBEDDING_MODEL_CONFIG__OVERRIDES__BASE_URL=http://127.0.0.1:11435/v1
+
+After an env change, recreate the api and deriver containers so they load the new model name. Before calling search compatible with the mesh, embed one stored text and cosine it against a mesh vector. Matching width plus a matching cosine is the compatibility check.
+
+## Order
+
+1. Install Hermes with the project installer, on that Mac.
+2. Run `hermes setup model`, or `hermes model`. Finish the browser login on that Mac.
+3. Check:
+   - `hermes auth status xai-oauth` says logged in
+   - `hermes config get model.default` is grok-4.7
+   - `hermes config get model.provider` is xai-oauth
+   - `hermes config get model.base_url` is https://api.x.ai/v1
+4. Start local Honcho from the self-host page. Then `hermes memory setup honcho`.
+5. Open vault/ in Obsidian. Read index.
+
+The current scripts are in scripts/.
+
+## This folder holds
+
+SETUP.txt, START.txt, scripts/, and vault/. Credentials, session stores, and model weights stay on the logged-in Mac. DENY.txt names the files that stay outside.

@@ -1,0 +1,17 @@
+# Files that stay on the logged-in Mac
+
+This folder holds SETUP.txt, START.txt, scripts/, and vault/.
+
+These stay outside this folder, on the Mac that logged in:
+
+.env
+.env.*
+auth.json
+honcho.json
+state.db
+*.session*
+pgdata
+*.gguf
+*.gguf.part
+api_key=
+sk-

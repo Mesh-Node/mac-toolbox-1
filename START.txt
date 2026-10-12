@@ -1,0 +1,7 @@
+macbook-toolbox
+
+SETUP.txt  Grok as the Hermes default. Read this first.
+vault/     open this in Obsidian, after the checks in SETUP.txt
+scripts/   mac-new-tab.sh, mac-inject.sh, mac-type-hermes.sh
+
+The current tools open a tab, print new= and donor=, and type a line into a named tty.
