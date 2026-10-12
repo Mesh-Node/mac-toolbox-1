@@ -11,4 +11,4 @@ secrets: false
 
 Stay in this vault. Read [[index]].
 
-The current tools are [[new-tab]], [[inject]], and [[type-hermes]].
+The current tools are [[new-tab]], [[inject]], [[type-hermes]], and [[hop]].

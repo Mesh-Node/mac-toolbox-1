@@ -17,6 +17,6 @@ The note is the tool. The command is what the note points at.
 
 Write the note when the command first exists. A command awaiting a run on the Mac keeps evidence `untested`.
 
-The current tools are [[new-tab]] [[inject]] [[type-hermes]]. Pattern: [[inbox/admit]].
+The current tools are [[new-tab]] [[inject]] [[type-hermes]] [[hop]]. Pattern: [[inbox/admit]].
 
 See [[toolchain]].

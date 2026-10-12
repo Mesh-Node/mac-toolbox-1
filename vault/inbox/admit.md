@@ -39,5 +39,6 @@ Admitted now:
 - [[new-tab]]
 - [[inject]]
 - [[type-hermes]]
+- [[hop]]
 
 `foundations/`, `runbooks/`, and `decisions/` wait for observed notes.

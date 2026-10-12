@@ -24,6 +24,7 @@ Vault root for the Mac operational toolbox. Personal notes stay in the personal 
 | [[new-tab]] | Open one tab. Prints new= and donor=. |
 | [[type-hermes]] | Type hermes into the tty argument. |
 | [[inject]] | Type one line into the tty argument. |
+| [[hop]] | At 80% of the window, open a tab and send the job. |
 | `foundations/` | Host facts after they are observed. |
 | `runbooks/` | After a task has run. |
 | `decisions/` | Operator-reviewed ADRs. |
