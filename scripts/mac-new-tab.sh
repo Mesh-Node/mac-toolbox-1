@@ -1,5 +1,6 @@
 #!/bin/sh
-# Open one Terminal tab and print the new tty and the donor tty.
+# Open one Terminal tab and print two tty numbers.
+# head is the tab this script opened. tail is the tty of the session that ran this script.
 # The chain stores those two lines. Later tools receive them as arguments.
 set -eu
 case "$(uname -s)" in
@@ -7,8 +8,8 @@ case "$(uname -s)" in
   *) echo "mac-new-tab.sh runs on Darwin" >&2; exit 5 ;;
 esac
 
-# The tty of this process when this process sits in a Terminal tab.
-donor_tty() {
+# The tty of the session that ran this script.
+tail_tty() {
   pid=$$
   i=0
   while [ "$pid" != 1 ] && [ "$i" -lt 16 ]; do
@@ -42,7 +43,7 @@ terminal_ttys() {
   ' | sort -u
 }
 
-DONOR=$(donor_tty) || { echo "donor tty was not found" >&2; exit 4; }
+TAIL=$(tail_tty) || { echo "tail tty was not found" >&2; exit 4; }
 BEFORE=$(terminal_ttys)
 
 # Bring Terminal to the front, then send Command-T.
@@ -75,8 +76,8 @@ while [ "$i" -lt 20 ]; do
   sleep 0.25
 done
 
-[ -n "$NEW" ] || { echo "new tty was not found" >&2; exit 4; }
+[ -n "$NEW" ] || { echo "head tty was not found" >&2; exit 4; }
 
-printf 'new=/dev/%s\n' "$NEW"
-printf 'donor=/dev/%s\n' "$DONOR"
+printf 'head=/dev/%s\n' "$NEW"
+printf 'tail=/dev/%s\n' "$TAIL"
 exit 0

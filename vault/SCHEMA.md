@@ -62,7 +62,7 @@ This tree is the Mac operational toolbox. Personal notes stay in the personal va
 ## Control preference
 
 1. Terminal. `hermes`, `brew`, files, `osascript` for one Terminal tab or one tty.
-2. Close a donor tab by one address. That one tty closes. The other tabs stay.
+2. Close one tty by address. That tty closes. The other tabs stay.
 3. GUI is the last surface. Terminal opens the tab. This vault is read as files.
 
 Mac notes use the Mac commands in `scripts/`.

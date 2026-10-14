@@ -9,7 +9,7 @@ secrets: false
 
 # How a tool is admitted
 
-This page is the pattern. The current tools are [[new-tab]] [[inject]] [[type-hermes]]. This vault holds the Mac toolbox.
+This page is the pattern. The only toolchain is [[hop-80]]. This vault holds the Mac toolbox.
 
 ## Tool
 
@@ -38,7 +38,10 @@ Admitted now:
 
 - [[new-tab]]
 - [[inject]]
-- [[type-hermes]]
 - [[hop]]
+- [[deliver]]
+- [[close-the-tty]]
+
+The only toolchain is [[hop-80]].
 
 `foundations/`, `runbooks/`, and `decisions/` wait for observed notes.

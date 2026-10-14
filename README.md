@@ -1,6 +1,6 @@
 # Mac toolbox
 
-A starter Hermes toolbox for a Mac. The current scripts open a tab, print the new tty and the donor tty, and type a line into a named tty.
+A starter Hermes toolbox for a Mac. A hop moves the current task to a new tab when the session reaches 80% of its window. The sending tty is the tail. The new tab is the head.
 
 ## Download
 

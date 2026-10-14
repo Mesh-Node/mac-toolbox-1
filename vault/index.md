@@ -17,14 +17,16 @@ Vault root for the Mac operational toolbox. Personal notes stay in the personal 
 | [[SCHEMA]] | Evidence labels and write rules |
 | [[tool]] | Definition of a tool. |
 | [[toolchain]] | Definition of a toolchain. |
+| [[hop-80]] | The only toolchain. At 80%, the tail builds the packet, starts hermes, and returns. Deliver pastes the packet and closes the tail. |
 | [[inbox/bootstrap]] | Setup pointer. |
 | [[inbox/Home]] | Start here. |
 | `inbox/` | Drafts and gaps. |
 | [[inbox/admit]] | How a tool and a toolchain are added. |
-| [[new-tab]] | Open one tab. Prints new= and donor=. |
-| [[type-hermes]] | Type hermes into the tty argument. |
+| [[new-tab]] | Open one tab. Prints head= and tail=. |
 | [[inject]] | Type one line into the tty argument. |
-| [[hop]] | At 80% of the window, open a tab and send the job. |
+| [[hop]] | At 80% of the window, build the packet, open a tab, type hermes, and return. |
+| [[deliver]] | Paste the hop packet into the head and close the tail. |
+| [[close-the-tty]] | Close one tty. |
 | `foundations/` | Host facts after they are observed. |
 | `runbooks/` | After a task has run. |
 | `decisions/` | Operator-reviewed ADRs. |

@@ -113,14 +113,10 @@ The numbers are the lines in `scripts/mac-inject.sh`.
 
 ## Ran
 
-2026-10-12, this Mac. `scripts/mac-inject.sh /dev/ttys013` typed this line and printed `typed on /dev/ttys013`. The exit was 0.
-
-`/Users/marksnowjr/Documents/macbook-toolbox/scripts/mac-new-tab.sh && sleep 1 && /Users/marksnowjr/Documents/macbook-toolbox/scripts/mac-type-hermes.sh`
-
-That line ran in ttys013. A new tty appeared, ttys014. Hermes pid 78189 is on ttys014. This session stayed on ttys001, pid 93112.
+2026-10-12, this Mac. `scripts/mac-inject.sh /dev/ttys013` typed a line and printed `typed on /dev/ttys013`. The exit was 0. A new tty appeared, ttys014. Hermes pid 78189 is on ttys014. This session stayed on ttys001, pid 93112.
 
 2026-10-12, this Mac. After the hop packet was typed into ttys013, a separate Return was sent to that tab. The keystroke exited 0. This session stayed on ttys001, pid 93112. The second Return now in the file was not part of that keystroke.
 
 ## Then
 
-The donor for the close is ttys014. This session stays on ttys001.
+The tail tty for the close is ttys014. This session stays on ttys001.

@@ -129,8 +129,8 @@ Read the rooms, then read [[index]].
 
 The operator can open this vault and see:
 
-- What a tool is, and that [[new-tab]] [[inject]] [[type-hermes]] are the current tools.
-- What a toolchain is. A chain note waits until that order has been run by hand.
+- What a tool is, and that [[new-tab]] [[inject]] [[hop]] [[deliver]] [[close-the-tty]] are the current tools.
+- What a toolchain is. The only toolchain is [[hop-80]].
 - Where a draft goes: `inbox/`.
 - That chat is Grok, logged in on that Mac, and the checks are in `../SETUP.txt`.
 

@@ -11,10 +11,8 @@ secrets: false
 
 A **toolchain** is a note under `toolchains/`.
 
-It is an ordered combination of [[tool]] notes. A wrapper script comes after that order has been run by hand.
+It is an ordered combination of [[tool]] notes.
 
-The current tools are [[new-tab]], then [[inject]]. A chain note waits until that order has been run by hand. Pattern: [[inbox/admit]].
-
-A wrapper waits until the order has been run on a Mac.
+The only toolchain is [[hop-80]].
 
 See [[tool]].

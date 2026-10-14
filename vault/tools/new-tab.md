@@ -9,7 +9,7 @@ secrets: false
 
 # new tab
 
-Open one Terminal tab and print two addresses. `new` is the tab Command-T opened. `donor` is the tab that launched this script.
+Open one Terminal tab and print two tty numbers. `head` is the tab Command-T opened. `tail` is the tty of the session that ran this script.
 
 The file is POSIX shell, started by `#!/bin/sh`. It is not Bash. The block between `APP` markers is AppleScript. `osascript` runs that block.
 
@@ -19,7 +19,7 @@ The chain stores the two printed lines. A name set inside this script dies when 
 eval "$(scripts/mac-new-tab.sh)"
 ```
 
-After that line, `$new` and `$donor` exist in the chain shell. Inject receives `"$new"`. Close receives `"$donor"`.
+After that line, `$head` and `$tail` exist in the chain shell. Inject receives `"$head"`. Close receives `"$tail"`.
 
 ## Command
 
@@ -29,20 +29,20 @@ scripts/mac-new-tab.sh
 
 ## In
 
-Terminal is already running. This script is launched from the donor tab.
+Terminal is already running. This script is launched from the tail tty.
 
 ## Out
 
 ```
-new=/dev/ttysNNN
-donor=/dev/ttysNNN
+head=/dev/ttysNNN
+tail=/dev/ttysNNN
 ```
 
 Exit 0. The script starts no command in the new tab.
 
-`donor tty was not found` and exit 4 when the parent walk finds no Terminal tty.
+`tail tty was not found` and exit 4 when the parent walk finds no Terminal tty.
 
-`new tty was not found` and exit 4 when Command-T does not add exactly one Terminal tty.
+`head tty was not found` and exit 4 when Command-T does not add exactly one Terminal tty.
 
 `mac-new-tab.sh runs on Darwin` and exit 5 on another system.
 
@@ -51,7 +51,7 @@ Exit 0. The script starts no command in the new tab.
 The numbers are the lines in `scripts/mac-new-tab.sh`.
 
 1. `#!/bin/sh` starts the file with the POSIX shell.
-2. The comment names the job: open one tab and print the new tty and the donor tty.
+2. The comment names the job: open one tab and print head and tail.
 3. The comment says the chain stores those two lines and later tools receive them as arguments.
 4. `set -eu` stops the script on an unset name or a failed command.
 5. `case "$(uname -s)"` reads the operating system name.
@@ -60,7 +60,7 @@ The numbers are the lines in `scripts/mac-new-tab.sh`.
 8. `esac` ends the system check.
 9. A blank line.
 10. The comment says the next function reads the tty of this process when this process sits in a Terminal tab.
-11. `donor_tty()` starts that function.
+11. `tail_tty()` starts that function.
 12. `pid=$$` starts the walk at this process.
 13. `i=0` counts the steps of the walk.
 14. The loop continues while the process is not launchd and the walk is under 16 steps.
@@ -94,7 +94,7 @@ The numbers are the lines in `scripts/mac-new-tab.sh`.
 42. `sort -u` keeps each tty once.
 43. `}` ends the function.
 44. A blank line.
-45. `DONOR=$(donor_tty)` stores the donor tty. A missing donor prints `donor tty was not found` and exits 4.
+45. `TAIL=$(tail_tty)` stores the tail tty. A missing tail prints `tail tty was not found` and exits 4.
 46. `BEFORE=$(terminal_ttys)` stores the Terminal tty list before Command-T.
 47. A blank line.
 48. The comment names the next job: bring Terminal to the front, then send Command-T.
@@ -127,18 +127,18 @@ The numbers are the lines in `scripts/mac-new-tab.sh`.
 75. `sleep 0.25` waits a quarter second for the new tty to appear.
 76. `done` ends the wait.
 77. A blank line.
-78. A missing new tty prints `new tty was not found` and exits 4.
+78. A missing head tty prints `head tty was not found` and exits 4.
 79. A blank line.
-80. `printf 'new=/dev/%s'` prints the new tab address.
-81. `printf 'donor=/dev/%s'` prints the donor tab address.
+80. `printf 'head=/dev/%s'` prints the head tty.
+81. `printf 'tail=/dev/%s'` prints the tail tty.
 82. `exit 0` ends the script after those two lines.
 
 ## Ran
 
-2026-10-12, this Mac. The saved file printed `new=/dev/ttys012` and `donor=/dev/ttys001`, and exited 0. `eval` stored those names. `mac-inject.sh "$new"` typed `echo chain-ok` into `/dev/ttys012`, printed `typed on /dev/ttys012`, and exited 0. The new tab wrote `chain-ok`. This session stayed on ttys001, pid 93112.
+2026-10-12, this Mac. The previous file printed `new=/dev/ttys012` and `donor=/dev/ttys001`. That run is not this file. This file prints `head=` and `tail=`.
 
 Earlier runs of the previous file, which printed nothing, opened a tab at 07:38 and opened ttys013 later the same day. Those runs are not this file.
 
 ## Then
 
-The chain passes `"$new"` to [[inject]]. `"$donor"` is the address for the close, when that tool exists.
+The chain passes `"$head"` to [[inject]]. `"$tail"` is the tty for a later action, including close.
