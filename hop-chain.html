@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hop-80 chain</title>
+<style>
+  :root {
+    --bg: #14120e;
+    --panel: #1c1914;
+    --ink: #ece6da;
+    --muted: #9a917f;
+    --line: #3a342b;
+    --amber: #e0a100;
+    --amber-dim: #8a6808;
+    --ok: #8faf6a;
+    --bad: #d46a4c;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font-family: var(--mono); }
+  body { display: grid; grid-template-rows: auto 1fr auto; min-height: 100%; }
+  header, footer { padding: 12px 16px; border-color: var(--line); border-style: solid; }
+  header { border-width: 0 0 1px; display: flex; justify-content: space-between; gap: 16px; align-items: baseline; }
+  footer { border-width: 1px 0 0; color: var(--muted); font-size: 12px; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: 0; margin: 0; }
+  h1 span { color: var(--amber); }
+  .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  main { display: grid; grid-template-columns: 280px 1fr; min-height: 0; }
+  aside, section { min-height: 0; }
+  aside { border-right: 1px solid var(--line); padding: 12px; overflow: auto; }
+  section { display: grid; grid-template-rows: auto 1fr auto; min-width: 0; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  button {
+    font: inherit; color: var(--ink); background: transparent;
+    border: 1px solid var(--line); min-height: 36px; padding: 0 10px; cursor: pointer;
+  }
+  button:hover, button:focus-visible { border-color: var(--amber); outline: none; }
+  button[aria-pressed="true"] { border-color: var(--amber); color: var(--amber); }
+  button:disabled { color: var(--muted); cursor: default; }
+  ol { list-style: none; margin: 0; padding: 0; }
+  li { padding: 8px 0; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+  li strong { display: block; color: var(--ink); font-weight: 600; }
+  li.on { color: var(--ink); }
+  li.on strong { color: var(--amber); }
+  li.done strong { color: var(--ok); }
+  .stage { padding: 12px 16px 0; display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  .stage h2 { margin: 0; font-size: 14px; font-weight: 600; }
+  .panes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 16px; min-height: 0; }
+  .term { border: 1px solid var(--line); background: #100e0b; display: flex; flex-direction: column; min-height: 220px; min-width: 0; }
+  .term header { border: 0; padding: 8px 10px; color: var(--muted); font-size: 12px; display: flex; justify-content: space-between; }
+  .term.gone { opacity: 0.45; }
+  pre { margin: 0; padding: 10px; white-space: pre-wrap; font: inherit; font-size: 13px; line-height: 1.45; flex: 1; }
+  .log { margin: 0 16px 12px; border: 1px solid var(--line); padding: 10px; font-size: 12px; color: var(--muted); min-height: 72px; }
+  .log b { color: var(--ink); font-weight: 600; }
+  .bad { color: var(--bad); }
+  .ok { color: var(--ok); }
+  @media (max-width: 800px) {
+    main { grid-template-columns: 1fr; }
+    aside { border-right: 0; border-bottom: 1px solid var(--line); }
+    .panes { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1><span>hop-80</span> chain</h1>
+    <div class="sub">Operate the steps. The old window is not copied.</div>
+  </div>
+  <div class="sub" id="meter">in 318000 / line 400000</div>
+</header>
+<main>
+  <aside>
+    <div class="controls">
+      <button type="button" id="back">Back</button>
+      <button type="button" id="next">Next</button>
+      <button type="button" id="play">Play</button>
+    </div>
+    <div class="controls">
+      <button type="button" id="landed" aria-pressed="true">Inject lands</button>
+      <button type="button" id="miss" aria-pressed="false">Inject misses</button>
+    </div>
+    <ol id="steps"></ol>
+  </aside>
+  <section>
+    <div class="stage">
+      <h2 id="title">Below the line</h2>
+      <div class="sub" id="script"></div>
+    </div>
+    <div class="panes">
+      <div class="term" id="tail-pane">
+        <header><span>tail</span><span id="tail-tty">ttys001</span></header>
+        <pre id="tail"></pre>
+      </div>
+      <div class="term" id="head-pane">
+        <header><span>head</span><span id="head-tty">—</span></header>
+        <pre id="head"></pre>
+      </div>
+    </div>
+    <pre class="log" id="log"></pre>
+  </section>
+</main>
+<footer>Shared start is one inject. Hop-80 adds the close after that inject exits 0. A miss leaves the tail open.</footer>
+<script>
+const PACKET = [
+  "Task: research reviews of Gemini Argon.",
+  "Continue: the write-up was not a search.",
+  "Read the last 3 turns of @session:default/20261012_175625_59ccf0."
+].join("\n");
+const LINE = "hermes chat --cli --query-file ~/.hermes/hops/job-20261012_175625_59ccf0.txt";
+
+const landedSteps = [
+  {
+    title: "Below the line",
+    script: "mac-hop.py",
+    meter: "in 318000 / line 400000",
+    tail: "hermes chat --cli\n\n> how many files are in the scratch folder?\n\n150 files.",
+    head: "",
+    headTty: "—",
+    tailGone: false,
+    log: "<b>mac-hop.py</b>  exit 0\nunder the line. no tab."
+  },
+  {
+    title: "Write the packet",
+    script: "mac-hop.py",
+    meter: "in 690269 / line 400000",
+    tail: "hermes chat --cli\n\n> research reviews of Gemini Argon.\n\n[reply finished. window crossed.]",
+    head: "",
+    headTty: "—",
+    tailGone: false,
+    log: "<b>job file</b>\n" + PACKET
+  },
+  {
+    title: "Open one tab",
+    script: "mac-new-tab.sh",
+    meter: "in 690269 / line 400000",
+    tail: "hermes chat --cli\n\n[still this session]",
+    head: "$",
+    headTty: "ttys012",
+    tailGone: false,
+    log: "<b>mac-new-tab.sh</b>  exit 0\nhead=/dev/ttys012\ntail=/dev/ttys001"
+  },
+  {
+    title: "Inject the harness",
+    script: "mac-inject-harness.sh",
+    meter: "in 690269 / line 400000",
+    tail: "hermes chat --cli\n\n[tail still open]",
+    head: "$ " + LINE + "\nhermes chat --cli\n\n" + PACKET,
+    headTty: "ttys012",
+    tailGone: false,
+    log: "<b>mac-inject.sh</b>  Window menu hits 1\n<b>typed on /dev/ttys012</b>  exit 0\n\nThe line is the shared start. It does not close."
+  },
+  {
+    title: "Close the tail",
+    script: "mac-close-tty.sh",
+    meter: "head attending",
+    tail: "[closed]",
+    head: "hermes chat --cli\n\n" + PACKET + "\n\n[first message is the packet]",
+    headTty: "ttys012",
+    tailGone: true,
+    log: "<b>latch</b>  690269/400000  written before the close\n<b>mac-close-tty.sh /dev/ttys001</b>\nclosed /dev/ttys001  exit 0"
+  }
+];
+
+const missSteps = landedSteps.slice(0, 3).concat([
+  {
+    title: "Inject misses",
+    script: "mac-inject-harness.sh",
+    meter: "in 690269 / line 400000",
+    tail: "hermes chat --cli\n\n[tail stays. no latch.]",
+    head: "$",
+    headTty: "ttys012",
+    tailGone: false,
+    log: "<b class=\"bad\">Window menu hits for TYPE-ttys012 is 0</b>\ninject exit 4\nno latch\nclose not run\nnext turn can retry"
+  }
+]);
+
+let branch = "landed";
+let index = 0;
+let timer = null;
+
+function steps() { return branch === "landed" ? landedSteps : missSteps; }
+
+function render() {
+  const list = steps();
+  const step = list[index];
+  document.getElementById("title").textContent = step.title;
+  document.getElementById("script").textContent = step.script;
+  document.getElementById("meter").textContent = step.meter;
+  document.getElementById("tail").textContent = step.tail;
+  document.getElementById("head").textContent = step.head || "—";
+  document.getElementById("tail-tty").textContent = "ttys001";
+  document.getElementById("head-tty").textContent = step.headTty;
+  document.getElementById("tail-pane").classList.toggle("gone", step.tailGone);
+  document.getElementById("log").innerHTML = step.log;
+  document.getElementById("back").disabled = index === 0;
+  document.getElementById("next").disabled = index === list.length - 1;
+  document.getElementById("landed").setAttribute("aria-pressed", String(branch === "landed"));
+  document.getElementById("miss").setAttribute("aria-pressed", String(branch === "miss"));
+  const rail = document.getElementById("steps");
+  rail.innerHTML = "";
+  list.forEach(function (item, i) {
+    const li = document.createElement("li");
+    if (i === index) li.className = "on";
+    else if (i < index) li.className = "done";
+    const strong = document.createElement("strong");
+    strong.textContent = item.title;
+    li.appendChild(strong);
+    li.appendChild(document.createTextNode(item.script));
+    rail.appendChild(li);
+  });
+}
+
+function stop() {
+  if (timer) clearInterval(timer);
+  timer = null;
+  document.getElementById("play").textContent = "Play";
+}
+
+function go(next) {
+  const list = steps();
+  index = Math.max(0, Math.min(list.length - 1, next));
+  render();
+}
+
+document.getElementById("back").onclick = function () { stop(); go(index - 1); };
+document.getElementById("next").onclick = function () { stop(); go(index + 1); };
+document.getElementById("play").onclick = function () {
+  if (timer) { stop(); return; }
+  document.getElementById("play").textContent = "Pause";
+  timer = setInterval(function () {
+    if (index >= steps().length - 1) { stop(); return; }
+    go(index + 1);
+  }, 1400);
+};
+document.getElementById("landed").onclick = function () { stop(); branch = "landed"; index = 0; render(); };
+document.getElementById("miss").onclick = function () { stop(); branch = "miss"; index = 0; render(); };
+document.addEventListener("keydown", function (event) {
+  if (event.key === "ArrowRight") go(index + 1);
+  if (event.key === "ArrowLeft") go(index - 1);
+});
+render();
+</script>
+</body>
+</html>

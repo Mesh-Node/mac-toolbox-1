@@ -9,9 +9,9 @@ secrets: false
 
 # deliver
 
-Wait until hermes is on the head tty. Paste the hop packet. Close the tail.
+Not the hop-80 close. The live chain injects one line with [[inject-harness]], then [[close-the-tty]] closes the tail after that inject exits 0.
 
-The 80% script starts this and returns. The packet inject is the close.
+This file pastes with Command-V even when the Window menu has no matching tab, and it treats a hermes process row as ready. That paste is not a landed packet. Awaiting a rewrite before any workflow calls it.
 
 ## Command
 

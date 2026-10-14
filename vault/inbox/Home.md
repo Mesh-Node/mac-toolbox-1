@@ -9,6 +9,6 @@ secrets: false
 
 # Start here
 
-Stay in this vault. Read [[index]].
+Stay in this vault. Read [[index]]. Then read [[inference-boundary]].
 
-The current tools are [[new-tab]], [[inject]], [[hop]], [[deliver]], and [[close-the-tty]].
+The current tools are [[new-tab]], [[inject]], [[inject-harness]], [[hop]], and [[close-the-tty]]. [[deliver]] is not the hop-80 close.

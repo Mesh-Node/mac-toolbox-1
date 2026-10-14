@@ -17,7 +17,7 @@ One Terminal tty. The address on the command line.
 scripts/mac-close-tty.sh /dev/ttysNNN
 ```
 
-The script writes the title token HOPCLOSE-<short> on that device, clicks the one Window menu item that contains the token, and sends Command-W. The Homebrew profile closes the tab on that keystroke. The script waits while that tty is still in the process list.
+The script writes the title token HOPCLOSE-<short> on that device, clicks the one Window menu item that contains the token, and sends Command-W. A person sets Ask before closing to Never on the profile new tabs use. The click path and how to change it later are in [[foundations/terminal-close-sheet]]. The scripts do not set it.
 
 ## In
 

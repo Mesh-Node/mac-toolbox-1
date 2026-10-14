@@ -50,7 +50,8 @@ After an env change, recreate the api and deriver containers so they load the ne
    - `hermes config get model.provider` is xai-oauth
    - `hermes config get model.base_url` is https://api.x.ai/v1
 4. Start local Honcho from the self-host page. Then `hermes memory setup honcho`.
-5. Open vault/ in Obsidian. Read index.
+5. A person sets the Terminal close sheet by hand. Terminal menu, Settings, Profiles, the profile new tabs use, Shell. When the shell exits: Close the window. Ask before closing: Never. To change it later, use the same screen. The steps are in vault/foundations/terminal-close-sheet.md. The scripts do not set this.
+6. Open vault/ in Obsidian. Read index.
 
 A pull of this folder is the toolbox and the scripts. Claude Code can read the notes and run a script by hand. The 80% fire is a Hermes hook. After Hermes is installed, point that hook at scripts/mac-hop-hook.py. The hook finds mac-hop.py beside itself. It does not use a user path.
 

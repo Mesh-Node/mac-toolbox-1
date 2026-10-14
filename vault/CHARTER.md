@@ -129,8 +129,8 @@ Read the rooms, then read [[index]].
 
 The operator can open this vault and see:
 
-- What a tool is, and that [[new-tab]] [[inject]] [[hop]] [[deliver]] [[close-the-tty]] are the current tools.
-- What a toolchain is. The only toolchain is [[hop-80]].
+- What a tool is, and that [[new-tab]] [[inject]] [[inject-harness]] [[hop]] [[close-the-tty]] are the current tools. [[deliver]] is not the hop-80 close.
+- What a toolchain is. [[open-harness]] is the base. [[hop-80]] adds the 80% gate and the tail close.
 - Where a draft goes: `inbox/`.
 - That chat is Grok, logged in on that Mac, and the checks are in `../SETUP.txt`.
 

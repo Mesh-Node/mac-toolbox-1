@@ -9,7 +9,7 @@ secrets: false
 
 # hop
 
-End of turn. When this session's prompt is at or over 80% of its window, the tail builds the hop packet, opens a tab, types `hermes` and Return, and returns. The old window is not copied.
+End of turn. When this session's prompt is at or over 80% of its window, the tail builds the hop packet, opens a tab, injects one line that starts Hermes with the packet file, and closes the tail after that inject exits 0. The old window is not copied.
 
 Two tty numbers:
 
@@ -18,7 +18,7 @@ Two tty numbers:
 
 The two numbers are different.
 
-The file is Python. The installed hook execs it. Under the line it exits 0 and prints nothing. Over the line it opens one tab, types `hermes` and Return, and returns. [[deliver]] pastes the packet and closes the tail.
+The file is Python. The installed hook execs it. Under the line it exits 0 and prints nothing. Over the line it opens one tab, injects one line that starts Hermes with the packet file as the first message, and closes the tail after that inject exits 0. A miss leaves the tail open and writes no latch.
 
 The packet is only these lines. `Task:` is the latest user line of the session that crossed, including a short line. A line that starts with `The job is:` is unwrapped to its first sentence. A line that starts with `kind: hop` is skipped. `Continue:` is the first sentence of the reply that just finished. The next line is `Read the last 3 turns of @session:<profile>/<id>.` `Read:` lists the paths the tail wrote in `~/.hermes/hops/context-<session id>.txt`, at most five, and only paths that exist. The tail address is not in the packet.
 
@@ -41,7 +41,7 @@ Under the line: no output, exit 0.
 
 A dry-run over the line prints `used/line window N`, the job, and `dry-run — current tab stays open` on stderr. Exit 0.
 
-A live run over the line prints `head=` and `tail=`, then `hermes started on /dev/ttysNNN`, and returns. The tail stays open. [[deliver]] pastes the packet and prints `closed /dev/ttysNNN`.
+A live run over the line prints `head=` and `tail=`, then `typed on /dev/ttysNNN`, then `closed /dev/ttysNNN`. The tail is closed only after the inject exits 0.
 
 ## Ran
 
@@ -51,4 +51,4 @@ A live run over the line prints `head=` and `tail=`, then `hermes started on /de
 
 ## Then
 
-[[deliver]] pastes the packet and closes the tail.
+[[inject-harness]] starts the head. [[close-the-tty]] closes the tail after that inject exits 0.

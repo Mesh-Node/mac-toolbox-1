@@ -17,15 +17,18 @@ Vault root for the Mac operational toolbox. Personal notes stay in the personal 
 | [[SCHEMA]] | Evidence labels and write rules |
 | [[tool]] | Definition of a tool. |
 | [[toolchain]] | Definition of a toolchain. |
-| [[hop-80]] | The only toolchain. At 80%, the tail builds the packet, starts hermes, and returns. Deliver pastes the packet and closes the tail. |
+| [[inference-boundary]] | Chat is the window. The harness is the machine around it. The vault is notes plus scripts until a script is in the tool list. |
+| [[hop-80]] | At 80%, the tail writes the packet and injects one line that starts Hermes with that file. The tail closes only after that inject exits 0. A miss writes no latch. |
+| [[open-harness]] | The same start, with no 80% gate and no tail close. |
 | [[inbox/bootstrap]] | Setup pointer. |
 | [[inbox/Home]] | Start here. |
 | `inbox/` | Drafts and gaps. |
 | [[inbox/admit]] | How a tool and a toolchain are added. |
 | [[new-tab]] | Open one tab. Prints head= and tail=. |
 | [[inject]] | Type one line into the tty argument. |
-| [[hop]] | At 80% of the window, build the packet, open a tab, type hermes, and return. |
-| [[deliver]] | Paste the hop packet into the head and close the tail. |
+| [[hop]] | At 80% of the window, write the packet, open a tab, inject the harness line, and close the tail after that inject exits 0. |
+| [[inject-harness]] | Type one line that starts Hermes with the packet file. Does not close. |
+| [[deliver]] | Not the hop-80 close. The paste misses when the Window menu has no match. |
 | [[close-the-tty]] | Close one tty. |
 | `foundations/` | Host facts after they are observed. |
 | `runbooks/` | After a task has run. |

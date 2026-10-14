@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""End of turn. At 80% of this session's window, start the head and return.
+"""End of turn. At 80% of this session's window, inject the packet and close.
 
-The open script prints head= and tail=. This script injects hermes and
-returns. mac-deliver.py injects the packet and closes the tail.
---dry-run prints the job and leaves the current tab open.
+The open script prints head= and tail=. The harness inject types one line
+into the head: hermes chat --cli --query-file <packet>. That line is the
+shared start. It does not close. Hop-80 closes the tail after that inject
+exits 0. --dry-run prints the job and leaves the current tab open.
 """
 from __future__ import annotations
 
@@ -32,9 +33,9 @@ CTX_CACHE = Path.home() / ".hermes" / "context_length_cache.yaml"
 IN_RE = re.compile(r" in=(\d+) ")
 # Open one tab. Prints head= and tail=.
 OPEN = ROOT / "mac-new-tab.sh"
-# Type one line into a named tty.
-INJECT = ROOT / "mac-inject.sh"
-# Close one tty. The tail runs this on itself, last.
+# Shared start. Packet file is the first message. Does not close.
+HARNESS = ROOT / "mac-inject-harness.sh"
+# Close one tty. Hop-80 runs this after the harness inject exits 0.
 CLOSE = ROOT / "mac-close-tty.sh"
 
 
@@ -407,25 +408,41 @@ def main() -> int:
     query = HOPS / f"job-{session_id or 'unknown'}.txt"
     query.write_text(job + "\n")
     os.chmod(query, 0o600)
-    # Start hermes and return. The deliver script injects the packet and closes the tail.
-    started = _run([str(INJECT), head, "hermes"], timeout=20)
+    # Shared start. One line into the head. The packet file is the first message.
+    # A miss leaves the tail open and writes no latch, so the next turn can retry.
+    started = _run([str(HARNESS), head, str(query)], timeout=30)
     if started.returncode != 0:
         sys.stderr.write(started.stderr or started.stdout)
+        print(opened.stdout.strip())
         return started.returncode or 4
-    (HOPS / "deliver.txt").write_text(f"{head}\n{tail}\n{query}\n")
-    os.chmod(HOPS / "deliver.txt", 0o600)
-    subprocess.Popen(
-        [sys.executable, str(ROOT / "mac-deliver.py")],
-        start_new_session=True,
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    print(opened.stdout.strip())
-    print(f"hermes started on {head}")
+    # The latch is on disk before the close. Closing this tty can stop this process.
     latch.write_text(f"{used}/{line}\n")
     os.chmod(latch, 0o600)
-    return 0
+    with latch.open("rb") as handle:
+        os.fsync(handle.fileno())
+    # Hop-80 addition. Close the tail only after the inject exited 0.
+    # A new session so Command-W does not kill the close before it finishes.
+    closing = subprocess.Popen(
+        [str(CLOSE), tail],
+        start_new_session=True,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    try:
+        closed_out, _ = closing.communicate(timeout=30)
+    except subprocess.TimeoutExpired:
+        closing.kill()
+        print(opened.stdout.strip())
+        sys.stdout.write(started.stdout)
+        print("close timed out", file=sys.stderr)
+        return 4
+    print(opened.stdout.strip())
+    sys.stdout.write(started.stdout)
+    if closed_out:
+        sys.stdout.write(closed_out if closed_out.endswith("\n") else closed_out + "\n")
+    return closing.returncode or 0
 
 
 if __name__ == "__main__":

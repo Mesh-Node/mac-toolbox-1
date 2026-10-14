@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chat and harness</title>
+<style>
+  :root {
+    --bg: #f4f0e6;
+    --ink: #1c1914;
+    --muted: #5c564c;
+    --line: #d4cbb8;
+    --paper: #fffdf8;
+    --mark: #8a5a12;
+    --ok: #2f6b45;
+    --bad: #8d3b28;
+    --serif: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--serif); }
+  body { min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; }
+  header, footer { padding: 16px 22px; border-color: var(--line); border-style: solid; }
+  header { border-width: 0 0 1px; display: flex; justify-content: space-between; gap: 16px; align-items: end; }
+  footer { border-width: 1px 0 0; color: var(--muted); font-family: var(--mono); font-size: 12px; }
+  h1 { font-size: 28px; font-weight: 500; margin: 0; letter-spacing: -0.02em; }
+  .kicker { font-family: var(--mono); font-size: 12px; color: var(--mark); margin: 0 0 6px; }
+  main { display: grid; grid-template-columns: 240px 1fr; min-height: 0; }
+  nav { border-right: 1px solid var(--line); padding: 16px; }
+  button {
+    font-family: var(--mono); font-size: 13px; color: var(--ink); background: transparent;
+    border: 1px solid var(--line); min-height: 40px; padding: 0 10px; cursor: pointer; margin: 0 6px 8px 0;
+  }
+  button:focus-visible, button:hover { border-color: var(--mark); outline: none; }
+  button[aria-pressed="true"] { border-color: var(--mark); color: var(--mark); }
+  button:disabled { color: var(--muted); cursor: default; }
+  ol { list-style: none; margin: 12px 0 0; padding: 0; }
+  li { font-family: var(--mono); font-size: 12px; color: var(--muted); padding: 8px 0; border-top: 1px solid var(--line); cursor: pointer; }
+  li.on { color: var(--ink); }
+  section { padding: 28px 36px 48px; max-width: 920px; }
+  h2 { font-size: 22px; font-weight: 500; margin: 0 0 12px; }
+  p { font-size: 18px; line-height: 1.45; margin: 0 0 14px; }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(180px, 0.85fr) minmax(0, 1.15fr);
+    gap: 12px;
+    align-items: stretch;
+    margin: 22px 0;
+  }
+  .side, .gate {
+    border: 1px solid var(--line);
+    background: var(--paper);
+    padding: 14px;
+    min-height: 160px;
+    min-width: 0;
+  }
+  .side h3, .gate h3 { font-family: var(--mono); font-size: 12px; font-weight: 600; margin: 0 0 8px; letter-spacing: 0; }
+  .side p, .gate p { font-size: 16px; overflow-wrap: break-word; }
+  .gate { border-color: var(--mark); }
+  .tag { font-family: var(--mono); font-size: 13px; color: var(--mark); }
+  @media (max-width: 800px) {
+    main { grid-template-columns: 1fr; }
+    nav { border-right: 0; border-bottom: 1px solid var(--line); }
+    .row { grid-template-columns: 1fr; }
+    section { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="kicker">Mensa Human + AI SIG</p>
+    <h1>Chat and harness</h1>
+  </div>
+  <p class="kicker" id="count">1 / 6</p>
+</header>
+<main>
+  <nav>
+    <button type="button" id="back">Back</button>
+    <button type="button" id="next">Next</button>
+    <ol id="rail"></ol>
+  </nav>
+  <section id="stage"></section>
+</main>
+<footer>The call crosses. The server stays. The toolbox is notes plus scripts until a script is in the tool list.</footer>
+<script>
+const steps = [
+  {
+    title: "The cut",
+    body: "A chat is the window. A harness is the machine around the window. Token Maxxing keeps that window for the job.",
+    leftLabel: "Chat",
+    left: "One prompt, one reply. Whatever you paste stays in the window.",
+    gate: "The window is the scarce thing.",
+    rightLabel: "Harness",
+    right: "Files, scripts, hooks, and human clicks. The model is one program on that host."
+  },
+  {
+    title: "Two sides",
+    body: "The model infers. The harness executes. Same arguments, same result, and no model inside, is the harness side.",
+    leftLabel: "Inference",
+    left: "A choice made from text. It can be wrong. The text required for the choice is pressure.",
+    gate: "Boundary",
+    rightLabel: "Deterministic",
+    right: "A script, a hook, a file. The 80% fire and the flag run because a rule fired. The model did not decide."
+  },
+  {
+    title: "The crossing",
+    body: "The tool call crosses. The server stays.",
+    leftLabel: "The call",
+    left: "The model writes the call. That is inference. A thick call carries a slice of the chat.",
+    gate: "Tool call",
+    rightLabel: "The server",
+    right: "The harness runs the server and brings a result back. Deterministic when it does not call a model, and the argument is a handle, an enum, or a path. A long result makes the gate thick. It does not move the server."
+  },
+  {
+    title: "Three thicknesses",
+    body: "Hook, thin call, skill. The difference is what stays in the window.",
+    leftLabel: "Hook and thin call",
+    left: "A hook does not cross. A thin call crosses once: a name already in the list, a handle out, a short result back.",
+    gate: "Thickness",
+    rightLabel: "Skill",
+    right: "A skill crosses and stays. The catalog is a name and one line. Opening it copies the chapter in. That chapter is sent again later."
+  },
+  {
+    title: "The toolbox",
+    body: "The Obsidian vault is notes plus scripts. It is not in the tool list. Reading a note is the skill path. The script is deterministic. Reaching it is the search.",
+    leftLabel: "Notes",
+    left: "Notes teach the person and, if loaded, the model. A loaded note is a chapter. It does not run.",
+    gate: "Not yet a listed tool",
+    rightLabel: "Scripts",
+    right: "Scripts already work. Reaching one costs a path lookup and a shell line. Put that same script in the tool list, with a packet path as the argument, and the search leaves the model."
+  },
+  {
+    title: "What to leave human",
+    body: "Some steps stay a click. The page names the click. A script does not perform it.",
+    leftLabel: "The click",
+    left: "Terminal, Settings, Profiles, the profile new tabs use, Shell. Ask before closing: Never. When the shell exits: Close the window.",
+    gate: "Human step",
+    rightLabel: "Leave this question",
+    right: "Same screen to change it later. A sheet means the close did not finish. If the harness already knows the action, why is the model reconstructing it?"
+  }
+];
+let index = 0;
+function pane(cls, heading, text) {
+  const div = document.createElement("div");
+  div.className = cls;
+  const h3 = document.createElement("h3");
+  h3.textContent = heading;
+  const p = document.createElement("p");
+  p.textContent = text;
+  if (cls === "gate") p.className = "tag";
+  div.append(h3, p);
+  return div;
+}
+function render() {
+  const s = steps[index];
+  document.getElementById("count").textContent = (index + 1) + " / " + steps.length;
+  const stage = document.getElementById("stage");
+  stage.replaceChildren();
+  const h2 = document.createElement("h2");
+  h2.textContent = s.title;
+  const lead = document.createElement("p");
+  lead.textContent = s.body;
+  const row = document.createElement("div");
+  row.className = "row";
+  row.append(pane("side", s.leftLabel, s.left), pane("gate", "Gate", s.gate), pane("side", s.rightLabel, s.right));
+  stage.append(h2, lead, row);
+  document.getElementById("back").disabled = index === 0;
+  document.getElementById("next").disabled = index === steps.length - 1;
+  const rail = document.getElementById("rail");
+  rail.replaceChildren();
+  steps.forEach(function (item, i) {
+    const li = document.createElement("li");
+    li.textContent = item.title;
+    if (i === index) li.className = "on";
+    li.onclick = function () { index = i; render(); };
+    rail.append(li);
+  });
+}
+document.getElementById("back").onclick = function () { if (index) { index--; render(); } };
+document.getElementById("next").onclick = function () { if (index < steps.length - 1) { index++; render(); } };
+document.addEventListener("keydown", function (e) {
+  if (e.key === "ArrowRight" && index < steps.length - 1) { index++; render(); }
+  if (e.key === "ArrowLeft" && index) { index--; render(); }
+});
+render();
+</script>
+</body>
+</html>

@@ -38,10 +38,12 @@ Admitted now:
 
 - [[new-tab]]
 - [[inject]]
+- [[inject-harness]]
 - [[hop]]
-- [[deliver]]
 - [[close-the-tty]]
 
-The only toolchain is [[hop-80]].
+[[deliver]] is not the hop-80 close.
+
+The testable base is [[open-harness]]. [[hop-80]] adds the 80% gate and the tail close.
 
 `foundations/`, `runbooks/`, and `decisions/` wait for observed notes.

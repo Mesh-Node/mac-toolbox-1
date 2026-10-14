@@ -17,6 +17,6 @@ The note is the tool. The command is what the note points at.
 
 Write the note when the command first exists. A command awaiting a run on the Mac keeps evidence `untested`.
 
-The current tools are [[new-tab]] [[inject]] [[hop]] [[deliver]] [[close-the-tty]]. Pattern: [[inbox/admit]].
+The current tools are [[new-tab]] [[inject]] [[inject-harness]] [[hop]] [[close-the-tty]]. [[deliver]] is not the hop-80 close. Pattern: [[inbox/admit]].
 
 See [[toolchain]].
