@@ -21,7 +21,7 @@ Two slots. Each slot keeps its own model.
 - Chat, and every Honcho language slot (deriver, summary, dream, dialectic): Grok, through the login above. grok-4.7 is the Hermes default.
 - Embeddings, for search that matches the mesh: nomic-embed-text-v1.5, F16, 768 dimensions. Same Hugging Face snapshot the mesh serves. This slot is the F16 file, served by llama-server.
 
-The embedder listens on 127.0.0.1:11435. Honcho's API listens on 127.0.0.1:8000. Each port keeps its own process.
+The embedder and Honcho each keep their own process. Find the embedder's listen address on that machine. On this Mac, llama-server listens on 127.0.0.1:11435. Honcho's API listens on 127.0.0.1:8000.
 
 ## Honcho
 
@@ -36,7 +36,7 @@ Embedding settings live in that server's env:
 
 - EMBEDDING_MODEL_CONFIG__MODEL=nomic-embed-text-v1.5
 - EMBEDDING_VECTOR_DIMENSIONS=768
-- EMBEDDING_MODEL_CONFIG__OVERRIDES__BASE_URL=http://127.0.0.1:11435/v1
+- EMBEDDING_MODEL_CONFIG__OVERRIDES__BASE_URL is an address the Honcho process can open. From that process, open the URL and require 200. When Honcho and the embedder share a network, that URL can be the listen address. When Honcho is in a container and the embedder is on the host, use the host address that container can open. On this Mac the container env is http://host.docker.internal:11435/v1. The host listen address is 127.0.0.1:11435.
 
 After an env change, recreate the api and deriver containers so they load the new model name. Before calling search compatible with the mesh, embed one stored text and cosine it against a mesh vector. Matching width plus a matching cosine is the compatibility check.
 
